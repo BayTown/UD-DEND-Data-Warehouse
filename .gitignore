@@ -1,2 +1,8 @@
 # Exclude config file
 dwh.cfg
+
+# Exclude diagrams
+diagram
+
+# Exclude pycache
+__pycache__
