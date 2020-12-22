@@ -61,18 +61,50 @@ log_data/2018/11/2018-11-13-events.json
 And below is an example of what the data in a log file, 2018-11-12-events.json, looks like.
 ![log-data](https://user-images.githubusercontent.com/32474126/102831228-886aac80-43eb-11eb-9601-cd7f4aa3eb79.png)
 
+
 ## Database schema
 
 ### Staging tables
-![ds_staging_tables](https://user-images.githubusercontent.com/32474126/102831393-fc0cb980-43eb-11eb-9690-eb7ef4f21c59.png)
+![ds_staging_tables](https://user-images.githubusercontent.com/32474126/102925999-8f99c500-4494-11eb-9053-4fb5a60b4491.png)
+
+Loading from Json - Loss of numeric precision:  
+In the staging table `staging_songs` I have chosen the data type TEXT instead of FLOAT for the columns artist_latitude, artist_longitude and duration.  
+The [AWS Redshift documentation](https://docs.aws.amazon.com/redshift/latest/dg/copy-usage_notes-copy-from-json.html) indicates that loading numbers from data files in JSON format may lose precision. These are then converted to FLOAT in the INSERT queries according to dim_artists.  
+
+The data types of all other columns, including the staging_events columns, were specially selected based on their content.
+I have not assigned keys such as SORTKEY or DISTKEY here, as these tables are only used for staging and no JOINS are executed on them.
+
+### Fact and dimension tables
+![ds_factdim_tables](https://user-images.githubusercontent.com/32474126/102926497-6463a580-4495-11eb-8eff-be67707df2d1.png)
 
 
+I would like to briefly explain a few things about the assigned distribution keys and sort keys:  
 
-info:
-distribution key all -> broadcasting on each cpu - small dimension tables, speed up joins
-AWS Redshift copy json
-https://docs.aws.amazon.com/de_de/redshift/latest/dg/copy-usage_notes-copy-from-json.html
-AWS Redshift copy
-https://forums.aws.amazon.com/thread.jspa?threadID=119125
+fact_songplays:
+- SORTKEY:
+Here I choose the timestamp `start_time`, since the data analysts are likely to make more inquiries over a certain period of time. This makes queries more efficient because they can skip entire blocks that fall outside the time range.
+- DISTKEY:
+I choose a distribution key for the column `song_id` here, as most of the queries are carried out here.
+I have not specified the distribution style here and therefore leave the selection to Redshift, as I trust AWS to make the right selection here.
 
-Verlust der numerischen Präzision
+dim_users:
+- DISTKEY:
+As mentioned above, the column song_id should receive a distribution key. This must also be noted in this table.
+
+dim_time:
+- SORTKEY:
+Here, too, the column start_time should be sorted in order to speed up queries.
+
+
+## How to run the scripts
+You can start the scripts via the console. But first you have to jump to the correct folder path. Here is an example of running a python script:
+```bash
+python etl.py
+```
+
+## Explanation of the files in the project  
+
+- `create_tables.py`
+  - This function controls the dropping and creation of the tables
+- `etl.py`
+  - This function maps the ETL task in this project.

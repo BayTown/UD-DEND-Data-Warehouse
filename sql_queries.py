@@ -23,51 +23,55 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 staging_events_table_create = ("""CREATE TABLE IF NOT EXISTS staging_events (
-                                  artist        TEXT,
-                                  auth          TEXT,
-                                  firstName     TEXT,
-                                  gender        TEXT,
-                                  itemInSession INT,
-                                  lastName      TEXT,
-                                  length        TEXT,
-                                  level         TEXT,
-                                  location      TEXT,
-                                  method        TEXT,
-                                  page          TEXT,
-                                  registration  TEXT,
-                                  sessionId     INT,
-                                  song          TEXT,
-                                  status        INT,
-                                  ts            BIGINT,
-                                  userAgent     TEXT,
-                                  userId        INT
+                                  artist          TEXT,
+                                  auth            TEXT,
+                                  firstName       TEXT,
+                                  gender          TEXT,
+                                  itemInSession   INT,
+                                  lastName        TEXT,
+                                  length          TEXT,
+                                  level           TEXT,
+                                  location        TEXT,
+                                  method          TEXT,
+                                  page            TEXT,
+                                  registration    TEXT,
+                                  sessionId       INT,
+                                  song            TEXT,
+                                  status          INT,
+                                  ts              BIGINT,
+                                  userAgent       TEXT,
+                                  userId          INT
                                   );
 """)
 
 staging_songs_table_create = ("""CREATE TABLE IF NOT EXISTS staging_songs (
-                                 num_songs        INT,
-                                 artist_id        TEXT,
-                                 artist_latitude  TEXT,
-                                 artist_longitude TEXT,
-                                 artist_location  TEXT,
-                                 artist_name      TEXT,
-                                 song_id          TEXT,
-                                 title            TEXT,
-                                 duration         TEXT,
-                                 year             INT
+                                 num_songs          INT,
+                                 artist_id          TEXT,
+                                 artist_latitude    TEXT,
+                                 artist_longitude   TEXT,
+                                 artist_location    TEXT,
+                                 artist_name        TEXT,
+                                 song_id            TEXT,
+                                 title              TEXT,
+                                 duration           TEXT,
+                                 year               INT
                                  );
 """)
 
 songplay_table_create = ("""CREATE TABLE IF NOT EXISTS fact_songplays (
-                            songplay_id INT       IDENTITY (0,1)  PRIMARY KEY,
-                            start_time  TIMESTAMP NOT NULL,
-                            user_id     INT       NOT NULL,
-                            level       TEXT      NOT NULL,
-                            song_id     TEXT      NOT NULL,
-                            artist_id   TEXT      NOT NULL,
-                            session_id  INT,       
-                            location    TEXT,    
-                            user_agent  TEXT                  
+                            songplay_id   INT         IDENTITY (0,1)   PRIMARY KEY,
+                            start_time    TIMESTAMP   NOT NULL         SORTKEY,
+                            user_id       INT         NOT NULL,
+                            level         TEXT        NOT NULL,
+                            song_id       TEXT        NOT NULL         DISTKEY,
+                            artist_id     TEXT        NOT NULL,
+                            session_id    INT,       
+                            location      TEXT,    
+                            user_agent    TEXT,
+                            FOREIGN KEY(start_time) REFERENCES dim_time(start_time),
+                            FOREIGN KEY(user_id)    REFERENCES dim_users(user_id),
+                            FOREIGN KEY(song_id)    REFERENCES dim_songs(song_id),
+                            FOREIGN KEY(artist_id)  REFERENCES dim_artists(artist_id)      
                             );
                         
 """)
@@ -82,11 +86,12 @@ user_table_create = ("""CREATE TABLE IF NOT EXISTS dim_users (
 """)
 
 song_table_create = ("""CREATE TABLE IF NOT EXISTS dim_songs (
-                        song_id     TEXT      NOT NULL   PRIMARY KEY,
+                        song_id     TEXT      NOT NULL   PRIMARY KEY   DISTKEY,
                         title       TEXT      NOT NULL,
-                        artist_id   TEXT,
+                        artist_id   TEXT      NOT NULL,
                         year        INT,
-                        duration    FLOAT 
+                        duration    FLOAT,
+                        FOREIGN KEY(artist_id) REFERENCES dim_artists(artist_id)
                         );
 """)
 
@@ -100,13 +105,13 @@ artist_table_create = ("""CREATE TABLE IF NOT EXISTS dim_artists (
 """)
 
 time_table_create = ("""CREATE TABLE IF NOT EXISTS dim_time (
-                        start_time TIMESTAMP   NOT NULL   PRIMARY KEY,
-                        hour       INT,
-                        day        INT,
-                        week       INT,
-                        month      INT,
-                        year       INT,
-                        weekday    INT
+                        start_time TIMESTAMP   NOT NULL   PRIMARY KEY   SORTKEY,
+                        hour       INT         NOT NULL,
+                        day        INT         NOT NULL,
+                        week       INT         NOT NULL,
+                        month      INT         NOT NULL,
+                        year       INT         NOT NULL,
+                        weekday    INT         NOT NULL
                         );
 """)
 
