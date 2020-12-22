@@ -3,17 +3,17 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&logo=Microsoft-Academic)](https://lbesson.mit-license.org/)
 
 
-## Data Warehouse
+## **Data Warehouse**
 ---  
   
 
 ## Introduction
 A music streaming startup, Sparkify, has grown their user base and song database and want to move their processes and data onto the cloud. Their data resides in S3, in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.
-As their data engineer, I am tasked with building an ETL pipeline that extracts their data from S3, stages them in Redshift, and transforms data into a set of dimensional tables for the analytics team of Sparkify to continue finding insights in what songs their users are listening to.
+As their data engineer, I am tasked with building an ETL pipeline that extracts their data from S3, stages them in Redshift, and transforms data into a set of dimensional tables for the analytics team of Sparkify to continue finding insights in what songs their users are listening to.  
 
 
 ## Project Description
-In this project, i will apply what i've learned on data warehouses and AWS to build an ETL pipeline for a database hosted on Redshift. To complete the project, i will load data from S3 to staging tables on Redshift and execute SQL statements that create the analytics tables from these staging tables.
+In this project, i will apply what i've learned on data warehouses and AWS to build an ETL pipeline for a database hosted on Redshift. To complete the project, i will load data from S3 to staging tables on Redshift and execute SQL statements that create the analytics tables from these staging tables.  
 
 
 ## Requirements
@@ -27,7 +27,7 @@ To use the module `psycopg2` with python you have to install it with the followi
 
   ```bash
   pip install psycopg2-binary
-  ```
+  ```  
 
 
 ## Project Datasets
@@ -47,7 +47,7 @@ song_data/A/A/B/TRAABJL12903CDCF1A.json
 And below is an example of what a single song file, TRAABJL12903CDCF1A.json, looks like.
 ```json
 {"num_songs": 1, "artist_id": "ARJIE2Y1187B994AB7", "artist_latitude": null, "artist_longitude": null, "artist_location": "", "artist_name": "Line Renaud", "song_id": "SOUPIRU12A6D4FA1E1", "title": "Der Kleine Dompfaff", "duration": 152.92036, "year": 0}
-```
+```  
 
 
 ### Log Dataset
@@ -59,7 +59,7 @@ log_data/2018/11/2018-11-12-events.json
 log_data/2018/11/2018-11-13-events.json
 ```
 And below is an example of what the data in a log file, 2018-11-12-events.json, looks like.
-![log-data](https://user-images.githubusercontent.com/32474126/102831228-886aac80-43eb-11eb-9601-cd7f4aa3eb79.png)
+![log-data](https://user-images.githubusercontent.com/32474126/102831228-886aac80-43eb-11eb-9601-cd7f4aa3eb79.png)  
 
 
 ## Database schema
@@ -107,4 +107,18 @@ python etl.py
 - `create_tables.py`
   - This function controls the dropping and creation of the tables
 - `etl.py`
-  - This function maps the ETL task in this project.
+  - This function maps the ETL task in this project. The loading of the json files into the staging tables and the transfer of the data from the staging tables to the fact and dimension tables are triggered here.
+- `sql_queries.py`
+  - Contains all necessary queries for the above mentioned Python scripts. This script cannot be run on its own.
+- `dwh_example.cfg`
+  - Here I have provided an example of the necessary config file. This file contains a few explanations. If this file is filled with credentials, it should not be shared under any circumstances.
+
+  
+## Project summary
+First I thought about and visualized the database schemas for the staging, fact and dimension tables.
+Then I wrote the SQL statements to create and drop the tables. The addition of the `dwh.cfg` with the credentials and access data to the Redshift cluster was the next step. The testing of the create and drop statements could of course not be missing here.
+Now it was time to complete the ETL pipeline in the Python script `etl.py`. This was also provided with exception handling and docstrings.
+In the same way I have implemented exception handling and docstrings in `create_tables.py`.
+As the penultimate step, the scripts `create_tables.py` and` etl.py` were checked for error-free function and the tables for correct content.
+In the end I wrote this beautiful and hopefully clear README.
+Have fun trying!
